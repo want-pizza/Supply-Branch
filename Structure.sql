@@ -95,3 +95,19 @@ GO
 ALTER TABLE Warehouse
 ADD CONSTRAINT FK_Warehouse_Product FOREIGN KEY (WarehouseID) REFERENCES Warehouse_Product(WarehouseProductID);
 GO
+
+-- Create the User table
+CREATE TABLE [User] (
+    UserID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(50) NOT NULL -- Example roles: 'Admin', 'Manager', 'Employee'
+);
+
+-- Create the OrderHistory table
+CREATE TABLE OrderHistory (
+    HistoryID INT IDENTITY(1,1) PRIMARY KEY,
+    OrderID INT NOT NULL,
+    StatusID INT NOT NULL, -- The previous status of the order
+    ChangeDate DATETIME NOT NULL DEFAULT GETDATE(),
+    ChangedBy INT NOT NULL, -- The User who changed the status
+);
