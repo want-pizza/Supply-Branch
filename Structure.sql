@@ -88,10 +88,6 @@ ALTER TABLE Product
 ADD CONSTRAINT FK_Product_Producer FOREIGN KEY (ProducerID) REFERENCES Supplier(SupplierID);
 GO
 
-ALTER TABLE Product
-DROP CONSTRAINT FK_Product_Unit;
-GO
-
 ALTER TABLE Warehouse
 ADD CONSTRAINT FK_Warehouse_Product FOREIGN KEY (WarehouseID) REFERENCES Warehouse_Product(WarehouseProductID);
 GO
