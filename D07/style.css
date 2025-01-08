@@ -1,0 +1,126 @@
+/* Загальні стилі */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Стилі для заголовків */
+h1, h2 {
+    text-align: center;
+    color: #0056b3;
+    margin: 20px 0;
+}
+
+/* Контейнер для контенту */
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Стилі для форм */
+form {
+    margin: 20px 0;
+    padding: 20px;
+    background: #eaf3ff;
+    border: 1px solid #cde0ff;
+    border-radius: 10px;
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+form input, form select, form button {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 5px 0 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #003d7a;
+}
+
+/* Таблиця */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #0056b3;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #eaf3ff;
+}
+
+/* Виділення для низького рівня запасів */
+table tr[style*="background-color: red"] {
+    background-color: #ffcccc !important;
+    color: #a10000 !important;
+}
+
+/* Стилі для кнопок */
+a.button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #0056b3;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+a.button:hover {
+    background-color: #003d7a;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    form input, form select, form button {
+        width: 100%;
+    }
+
+    table th, table td {
+        font-size: 14px;
+    }
+}
