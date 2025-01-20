@@ -1,5 +1,3 @@
-
-
 <?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -17,55 +15,57 @@ try {
 
     // Базовий SQL-запит
     $query = "
-        SELECT 
-            o.OrderID, 
-            o.Name AS OrderName, 
-            o.Price AS OrderPrice, 
-            MIN(op.ShippingDate) AS OrderDate, -- Використовуємо мінімальну дату доставки
-            CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeName, 
-            w.Name AS WarehouseName, 
-            STRING_AGG(p.Name + ' (Qty: ' + CAST(op.Quantity AS NVARCHAR) + ')', ', ') AS Products
-        FROM [Order] o
-        JOIN Employee e ON o.EmployeeID = e.EmployeeID
-        JOIN Warehouse w ON o.WarehouseID = w.WarehouseID
-        JOIN Order_Product op ON o.OrderID = op.OrderID
-        JOIN Product p ON op.ProductID = p.ProductID
-        WHERE 1=1
-    ";
+SELECT
+    O.OrderID,
+    O.Name AS OrderName,
+    O.Price,
+    OH.ChangeDate AS OrderDate,
+    OS.Name AS OrderStatus,
+    CONCAT(E.FirstName, ' ', E.LastName) AS EmployeeName,
+    W.Name AS WarehouseName
+FROM
+    dbo.[Order] O
+JOIN
+    dbo.OrderHistory OH ON O.OrderID = OH.OrderID
+JOIN
+    dbo.OrderStatus OS ON OH.StatusID = OS.OrderStatusID
+JOIN
+    dbo.Employee E ON O.EmployeeID = E.EmployeeID
+JOIN
+    dbo.Warehouse W ON O.WarehouseID = W.WarehouseID
+WHERE 1=1
+";
 
     // Динамічне додавання фільтрів
     $params = [];
 
     // Фільтр за працівником
     if (!empty($employeeFilter)) {
-        $query .= " AND CONCAT(e.FirstName, ' ', e.LastName) LIKE :employeeFilter";
+        $query .= " AND CONCAT(E.FirstName, ' ', E.LastName) LIKE :employeeFilter";
         $params[':employeeFilter'] = '%' . $employeeFilter . '%';
     }
 
     // Фільтр за складом
     if (!empty($warehouseFilter)) {
-        $query .= " AND w.Name LIKE :warehouseFilter";
+        $query .= " AND W.Name LIKE :warehouseFilter";
         $params[':warehouseFilter'] = '%' . $warehouseFilter . '%';
     }
 
     // Фільтри за датами (обидва або окремо)
     if (!empty($dateFrom) && !empty($dateTo)) {
-        $query .= " AND op.ShippingDate BETWEEN :dateFrom AND :dateTo";
+        $query .= " AND OH.ChangeDate BETWEEN :dateFrom AND :dateTo";
         $params[':dateFrom'] = $dateFrom;
         $params[':dateTo'] = $dateTo;
     } elseif (!empty($dateFrom)) {
-        $query .= " AND op.ShippingDate >= :dateFrom";
+        $query .= " AND OH.ChangeDate >= :dateFrom";
         $params[':dateFrom'] = $dateFrom;
     } elseif (!empty($dateTo)) {
-        $query .= " AND op.ShippingDate <= :dateTo";
+        $query .= " AND OH.ChangeDate <= :dateTo";
         $params[':dateTo'] = $dateTo;
     }
 
-    // Групування та сортування
-    $query .= "
-        GROUP BY o.OrderID, o.Name, o.Price, e.FirstName, e.LastName, w.Name
-        ORDER BY MIN(op.ShippingDate) DESC
-    ";
+    // Сортування за датою зміни
+    $query .= " ORDER BY OH.ChangeDate DESC";
 
     // Виконання запиту
     $stmt = $conn->prepare($query);
@@ -81,6 +81,4 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
-
 ?>
-

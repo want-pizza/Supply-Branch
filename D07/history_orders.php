@@ -29,77 +29,80 @@
 
     <!-- Tabela wyników -->
     <table id="ordersTable">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nazwa zamówienia</th>
-                <th>Cena</th>
-                <th>Data</th>
-                <th>Pracownik</th>
-                <th>Magazyn</th>
-                <th>Produkty</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dane będą ładowane przez AJAX -->
-        </tbody>
-    </table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nazwa zamówienia</th>
+            <th>Cena</th>
+            <th>Data</th>
+            <th>Pracownik</th>
+            <th>Magazyn</th>
+            <th>Stan zamówienia</th> <!-- Додаємо колонку -->
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Dane będą ładowane przez AJAX -->
+    </tbody>
+</table>
 
-    <script>
-        $(document).ready(function () {
-            // Funkcja ładowania danych
-            function loadOrders(filters = {}) {
-                $.ajax({
-                    url: 'fetching_history_orders.php',
-                    method: 'GET',
-                    data: filters,
-                    success: function (response) {
-                        const tbody = $('#ordersTable tbody');
-                        tbody.empty();
 
-                        if (response.length > 0) {
-                            response.forEach(order => {
-                                const row = `
-                                    <tr>
-                                        <td>${order.OrderID}</td>
-                                        <td>${order.OrderName}</td>
-                                        <td>${order.OrderPrice} zł</td>
-                                        <td>${order.OrderDate}</td>
-                                        <td>${order.EmployeeName}</td>
-                                        <td>${order.WarehouseName}</td>
-                                        <td>${order.Products}</td>
-                                    </tr>
-                                `;
-                                tbody.append(row);
-                            });
-                        } else {
-                            tbody.append('<tr><td colspan="7">Brak zamówień zgodnych z wybranymi kryteriami.</td></tr>');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                         alert(`Wystąpił błąd: ${xhr.responseText || status || error}`);
-                        console.error(`Błąd AJAX: ${xhr.responseText || status || error}`);
+<script>
+    $(document).ready(function () {
+        // Функція для завантаження замовлень
+        function loadOrders(filters = {}) {
+            $.ajax({
+                url: 'fetching_history_orders.php',
+                method: 'GET',
+                data: filters,
+                success: function (response) {
+                    console.log(response);
+                    const tbody = $('#ordersTable tbody');
+                    tbody.empty();
+
+                    if (response.length > 0) {
+                        response.forEach(order => {
+                            const row = `
+                                <tr>
+                                    <td>${order.OrderID}</td>
+                                    <td><a href="order_details.php?order_id=${order.OrderID}" class="order-link">${order.OrderName}</a></td>
+                                    <td>${order.OrderPrice} zł</td>
+                                    <td>${order.OrderDate}</td>
+                                    <td>${order.EmployeeName}</td>
+                                    <td>${order.WarehouseName}</td>
+                                    <td>${order.OrderStatus}</td> <!-- Додаємо статус замовлення -->
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="7">Brak zamówień zgodnych з wybranymi kryteriami.</td></tr>');
                     }
-                });
-            }
-
-            // Ładowanie danych po załadowaniu strony
-            loadOrders();
-
-            // Obsługa formularza filtracji
-            $('#filterForm').on('submit', function (e) {
-                e.preventDefault();
-
-                const filters = {
-                    employee: $('#employee').val(),
-                    warehouse: $('#warehouse').val(),
-                    date_from: $('#date_from').val(),
-                    date_to: $('#date_to').val()
-                };
-
-                loadOrders(filters);
+                },
+                error: function (xhr, status, error) {
+                    alert(`Wystąpił błąd: ${xhr.responseText || status || error}`);
+                    console.error(`Błąd AJAX: ${xhr.responseText || status || error}`);
+                }
             });
+        }
+
+        // Завантаження замовлень при першому завантаженні сторінки
+        loadOrders();
+
+        // Обробка фільтрації
+        $('#filterForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const filters = {
+                employee: $('#employee').val(),
+                warehouse: $('#warehouse').val(),
+                date_from: $('#date_from').val(),
+                date_to: $('#date_to').val()
+            };
+
+            loadOrders(filters);
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 try {
     // Підключення до бази даних
-    $conn = new PDO("sqlsrv:server=DESKTOP-49IMCI6\SQLEXPRESS;Database=StoreManagement");
+    $conn = new PDO("sqlsrv:server=DESKTOP-1D7L568;Database=StoreManagement");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
      catch (PDOException $e) {
