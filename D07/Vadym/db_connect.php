@@ -1,6 +1,6 @@
 <?php
 // Параметры подключения к серверу базы данных
-$serwer = "DESKTOP-9LEEGGO\SQLEXPRESS";  // Имя вашего SQL Server
+$serwer = "DESKTOP-7EVIF4Q\SQLEXPRESS";  // Имя вашего SQL Server
 $baza_danych = "StoreManagement";  // Название вашей базы данных
 
 // Параметры подключения
