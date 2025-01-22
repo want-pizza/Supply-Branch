@@ -1,6 +1,13 @@
 <?php
 require 'db_connect.php'; // Подключение к базе данных
 
+// Подключаем автозагрузчик Composer
+require 'vendor/autoload.php';
+
+// Импортируем нужные классы для работы с Excel
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 // Подключаем соединение
 $polaczenie = require 'db_connect.php';
 
@@ -67,8 +74,6 @@ if ($format === 'pdf') {
     $pdf->writeHTML($html);
     $pdf->Output('Raport.pdf', 'D');
 } elseif ($format === 'excel') {
-    require 'vendor/autoload.php'; // Подключаем автозагрузчик
-
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setCellValue('A1', 'OrderID')
