@@ -31,7 +31,7 @@ $query = "SELECT o.OrderID, o.Name AS OrderName, p.Name AS ProductName, op.Quant
           INNER JOIN Order_Product op ON o.OrderID = op.OrderID
           INNER JOIN Product p ON op.ProductID = p.ProductID
           INNER JOIN Supplier s ON op.SupplierID = s.SupplierID
-          WHERE op.ShippingDate BETWEEN ? AND ? OR op.DeliveryDate BETWEEN ? AND ?";
+          WHERE (op.ShippingDate BETWEEN ? AND ? OR op.DeliveryDate BETWEEN ? AND ?)";
 
 // Если есть поставщик, добавляем фильтрацию по нему
 if (!empty($supplierID)) {
@@ -39,7 +39,11 @@ if (!empty($supplierID)) {
 }
 
 // Подготовка запроса
-$stmt = sqlsrv_prepare($polaczenie, $query, array($startDate, $endDate, $startDate, $endDate, $supplierID));
+if (!empty($supplierID)) {
+    $stmt = sqlsrv_prepare($polaczenie, $query, array($startDate, $endDate, $startDate, $endDate, $supplierID));
+} else {
+    $stmt = sqlsrv_prepare($polaczenie, $query, array($startDate, $endDate, $startDate, $endDate));
+}
 
 // Выполнение запроса
 if (sqlsrv_execute($stmt)) {
