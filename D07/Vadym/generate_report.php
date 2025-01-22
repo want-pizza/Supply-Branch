@@ -24,6 +24,9 @@ $format = $_POST['format'];
 
 // Инициализация массива для хранения результатов
 $results = [];
+$totalOrders = 0;
+$totalQuantity = 0;
+$uniqueSuppliers = [];
 
 // Формирование SQL-запроса для фильтрации по дате отгрузки (ShippingDate) и доставки (DeliveryDate)
 $query = "SELECT o.OrderID, o.Name AS OrderName, p.Name AS ProductName, op.Quantity, s.Name AS SupplierName, op.ShippingDate, op.DeliveryDate
@@ -32,7 +35,7 @@ $query = "SELECT o.OrderID, o.Name AS OrderName, p.Name AS ProductName, op.Quant
           INNER JOIN Product p ON op.ProductID = p.ProductID
           INNER JOIN Supplier s ON op.SupplierID = s.SupplierID
           WHERE (op.ShippingDate BETWEEN ? AND ? OR op.DeliveryDate BETWEEN ? AND ?)";
-
+          
 // Если есть поставщик, добавляем фильтрацию по нему
 if (!empty($supplierID)) {
     $query .= " AND op.SupplierID = ?";
@@ -52,6 +55,11 @@ if (sqlsrv_execute($stmt)) {
         $row['ShippingDate'] = $row['ShippingDate'] ? $row['ShippingDate']->format('Y-m-d') : '';
         $row['DeliveryDate'] = $row['DeliveryDate'] ? $row['DeliveryDate']->format('Y-m-d') : '';
         $results[] = $row;
+
+        // Статистика
+        $totalOrders++;
+        $totalQuantity += $row['Quantity'];
+        $uniqueSuppliers[$row['SupplierName']] = true;
     }
 } else {
     // Получаем и выводим подробности ошибки
@@ -64,8 +72,21 @@ if ($format === 'pdf') {
     $pdf = new TCPDF();
     $pdf->AddPage();
     $html = "<h1>Raport</h1>";
+
+    // Добавление даты генерации отчёта
+    $html .= "<p><strong>Data wygenerowania raportu:</strong> " . date('Y-m-d H:i:s') . "</p>";
+    $html .= "<p><strong>Okres raportu:</strong> $startDate - $endDate</p>";
+
+    // Добавление статистики
+    $html .= "<p><strong>Statystyki:</strong></p>";
+    $html .= "<ul>";
+    $html .= "<li><strong>Liczba zamówien:</strong> $totalOrders</li>";
+    $html .= "<li><strong>Laczna liczba produktów:</strong> $totalQuantity</li>";
+    $html .= "<li><strong>Liczba unikalnych dostawców:</strong> " . count($uniqueSuppliers) . "</li>";
+    $html .= "</ul>";
+
     $html .= "<table border='1'><thead><tr><th>OrderID</th><th>Order Name</th><th>Product</th><th>Quantity</th><th>Supplier</th><th>Shipping Date</th><th>Delivery Date</th></tr></thead><tbody>";
-    
+
     // Проверка на наличие данных в $results
     if (!empty($results)) {
         foreach ($results as $row) {
@@ -80,15 +101,33 @@ if ($format === 'pdf') {
 } elseif ($format === 'excel') {
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setCellValue('A1', 'OrderID')
-          ->setCellValue('B1', 'Order Name')
-          ->setCellValue('C1', 'Product')
-          ->setCellValue('D1', 'Quantity')
-          ->setCellValue('E1', 'Supplier')
-          ->setCellValue('F1', 'Shipping Date')
-          ->setCellValue('G1', 'Delivery Date');
 
-    $rowIndex = 2;
+    // Заголовок отчёта
+    $sheet->setCellValue('A1', 'Raport')
+          ->mergeCells('A1:G1')
+          ->setCellValue('A2', 'Data wygenerowania raportu:')
+          ->setCellValue('B2', date('Y-m-d H:i:s'))
+          ->setCellValue('A3', 'Okres raportu:')
+          ->setCellValue('B3', "$startDate - $endDate");
+
+    // Статистика
+    $sheet->setCellValue('A5', 'Statystyki:')
+          ->setCellValue('A6', 'Liczba zamówien:')
+          ->setCellValue('B6', $totalOrders)
+          ->setCellValue('A7', 'Laczna liczba produktów:')
+          ->setCellValue('B7', $totalQuantity)
+          ->setCellValue('A8', 'Liczba unikalnych dostawców:')
+          ->setCellValue('B8', count($uniqueSuppliers));
+
+    $sheet->setCellValue('A10', 'OrderID')
+          ->setCellValue('B10', 'Order Name')
+          ->setCellValue('C10', 'Product')
+          ->setCellValue('D10', 'Quantity')
+          ->setCellValue('E10', 'Supplier')
+          ->setCellValue('F10', 'Shipping Date')
+          ->setCellValue('G10', 'Delivery Date');
+
+    $rowIndex = 11;
 
     // Проверка на наличие данных в $results
     if (!empty($results)) {
@@ -103,7 +142,7 @@ if ($format === 'pdf') {
             $rowIndex++;
         }
     } else {
-        $sheet->setCellValue("A2", "Brak danych");
+        $sheet->setCellValue("A11", "Brak danych");
     }
 
     $writer = new Xlsx($spreadsheet);
