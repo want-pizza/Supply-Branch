@@ -12,7 +12,6 @@ try {
 } catch (Exception $e) {
     echo "Ошибка при выполнении запроса: " . $e->getMessage();
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -23,38 +22,49 @@ try {
     <link rel="stylesheet" href="styles.css"> <!-- Подключение CSS -->
 </head>
 <body>
-    <header>
-        <h1>Generowanie raportów</h1>
-        <h2>Tworzenie szczegółowych raportów</h2>
-    </header>
-    <section id="report-form">
-        <h3>Wybierz kryteria do raportu</h3>
-        <form method="post" action="generate_report.php">
-            <label for="start-date">Data początkowa:</label>
-            <input type="date" id="start-date" name="start-date" required>
+    <div class="container">
+        <header>
+            <h1>Generowanie raportów</h1>
+            <h2>Tworzenie szczegółowych raportów</h2>
+        </header>
 
-            <label for="end-date">Data końcowa:</label>
-            <input type="date" id="end-date" name="end-date" required>
+        <section id="report-form">
+            <h3>Wybierz kryteria do raportu</h3>
+            <form method="post" action="generate_report.php">
+                <div class="form-group">
+                    <label for="start-date">Data początkowa:</label>
+                    <input type="date" id="start-date" name="start-date" required>
+                </div>
 
-            <label for="supplier">Dostawca:</label>
-            <select id="supplier" name="supplier">
-                <option value="">Wszyscy dostawcy</option>
-                <?php
-                // Отображение списка поставщиков
-                foreach ($suppliers as $supplier) {
-                    echo "<option value=\"{$supplier['SupplierID']}\">{$supplier['Name']}</option>";
-                }
-                ?>
-            </select>
+                <div class="form-group">
+                    <label for="end-date">Data końcowa:</label>
+                    <input type="date" id="end-date" name="end-date" required>
+                </div>
 
-            <label for="format">Format raportu:</label>
-            <select id="format" name="format">
-                <option value="pdf">PDF</option>
-                <option value="excel">Excel</option>
-            </select>
+                <div class="form-group">
+                    <label for="supplier">Dostawca:</label>
+                    <select id="supplier" name="supplier">
+                        <option value="">Wszyscy dostawcy</option>
+                        <?php
+                        // Отображение списка поставщиков
+                        foreach ($suppliers as $supplier) {
+                            echo "<option value=\"{$supplier['SupplierID']}\">{$supplier['Name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
 
-            <button type="submit">Generuj raport</button>
-        </form>
-    </section>
+                <div class="form-group">
+                    <label for="format">Format raportu:</label>
+                    <select id="format" name="format">
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">Generuj raport</button>
+            </form>
+        </section>
+    </div>
 </body>
 </html>
